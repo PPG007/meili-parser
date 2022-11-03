@@ -1,7 +1,6 @@
 package main
 
 import (
-	"context"
 	"crypto/md5"
 	"encoding/hex"
 	"encoding/json"
@@ -22,17 +21,17 @@ var (
 )
 
 type Document struct {
-	Id          string `json:"id,omitempty"`
-	TitleLevel0 string `json:"titleLevel0,omitempty"`
-	TitleLevel1 string `json:"titleLevel1,omitempty"`
-	TitleLevel2 string `json:"titleLevel2,omitempty"`
-	TitleLevel3 string `json:"titleLevel3,omitempty"`
-	TitleLevel4 string `json:"titleLevel4,omitempty"`
-	Content     string `json:"content,omitempty"`
-	URL         string `json:"URL,omitempty"`
+	Id          string `json:"id"`
+	TitleLevel0 string `json:"titleLevel0"`
+	TitleLevel1 string `json:"titleLevel1"`
+	TitleLevel2 string `json:"titleLevel2"`
+	TitleLevel3 string `json:"titleLevel3"`
+	TitleLevel4 string `json:"titleLevel4"`
+	Content     string `json:"content"`
+	URL         string `json:"URL"`
 }
 
-func (d *Document) Create(ctx context.Context, index *meilisearch.Index) error {
+func (d *Document) Create(index *meilisearch.Index) error {
 	d.Id = primitive.NewObjectID().Hex()
 	_, err := index.AddDocuments(d)
 	return err
@@ -65,6 +64,16 @@ func ConvertMapToDocument(m map[string]string) Document {
 	bytes, _ := json.Marshal(m)
 	json.Unmarshal(bytes, &doc)
 	return doc
+}
+
+func (d *Document) ConvertToMap() map[string]interface{} {
+	bytes, err := json.Marshal(d)
+	if err != nil {
+		return nil
+	}
+	result := map[string]interface{}{}
+	json.Unmarshal(bytes, &result)
+	return result
 }
 
 func (d *Document) GetHashValue() string {
